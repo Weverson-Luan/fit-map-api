@@ -1,0 +1,46 @@
+import { CheckInsRepository } from '@/repositories/prisma/check-ins-repository/check-ins-repository';
+import { CheckIn } from 'generated/prisma';
+import { ResourceNotFoundError } from '../errors/resource/resource-not-found-error';
+import dayjs from 'dayjs';
+import { LateCheckInValidationError } from '../errors/checkin/late-check-in-validation-error';
+
+interface ValidateCheckInUseCaseRequest {
+  checkInId: string;
+}
+
+interface ValidateCheckInUseCaseResponse {
+  checkIn: CheckIn;
+}
+
+export class ValidateCheckInUseCase {
+  constructor(private checkInsRepository: CheckInsRepository) {}
+
+  async execute({
+    checkInId,
+  }: ValidateCheckInUseCaseRequest): Promise<ValidateCheckInUseCaseResponse> {
+    const checkIn = await this.checkInsRepository.findById(checkInId);
+
+    if (!checkIn) {
+      throw new ResourceNotFoundError();
+    }
+
+    // distância em minutos aparti da criação do check-in
+    const distanceInMinutesFromCheckInCreation = dayjs(new Date()).diff(
+      checkIn.created_at,
+      'minutes',
+    );
+
+    // se a distância for maior que 20 minutos, lança um erro
+    if (distanceInMinutesFromCheckInCreation > 20) {
+      throw new LateCheckInValidationError();
+    }
+
+    checkIn.validated_at = new Date();
+
+    await this.checkInsRepository.save(checkIn);
+
+    return {
+      checkIn,
+    };
+  }
+}

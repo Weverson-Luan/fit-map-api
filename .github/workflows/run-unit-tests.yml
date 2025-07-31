@@ -1,0 +1,20 @@
+name: Run Unit Tests
+
+on: [push] ## quando houver um push
+
+jobs:
+  run-unit-tests: ## jobs
+    name: Run Unit Tests ## nome job
+    runs-on: ubuntu-latest ## maquina para rodar os jobs
+
+    steps:
+      - uses: actions/checkout@v3 ## baixar o código da aplicação
+
+      - uses: actions/setup-node@v3 ## utilizar o node
+        with:
+          node-version: 18 ## versão do node
+          cache: 'npm' ## para armezanar o cahche das dependêcias
+
+      - run: npm ci ## comando para instalar as dependêcias
+
+      - run: npm run test ## comando para roda os testes únitarios da aplicação

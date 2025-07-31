@@ -1,0 +1,70 @@
+// Este é o seu arquivo de esquema Prisma,
+// Saiba mais sobre ele na documentação: https://pris.ly/d/prisma-schema
+
+// Procurando maneiras de acelerar suas consultas ou escalar facilmente com suas funções serverless ou edge?
+// Experimente o Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// RELACIONAMENTOS
+
+// 1 para 1 -> Um dado de uma tabela vai se relacionar apenas com um dado de outra tabela
+// 1 para N -> Um dado de uma tabela vai se relacionar com varios dados de outra tabela
+// N para N -> Um dado de uma tabela vai se relacionar com varios dados de outra tabela e um registro da tabela pode está relacionado com outra
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+// DADOS DO USUÁRIO
+model User {
+  id            String @id @default(uuid()) // aqui estamos dizendo que o campo id chave-primaria e default auto incrementa
+  name          String
+  email         String @unique // e-mail único por usuário
+  password_hash String
+  role          Role   @default(MEMBER)
+
+  created_at DateTime @default(now())
+
+  checkIns CheckIn[] // usuário pode ter vários checkins
+
+  @@map("users") // nomeando o nome da tabela 
+}
+
+// DADOS DA CHECK-IN 
+model CheckIn {
+  id           String    @id @default(uuid())
+  created_at   DateTime  @default(now())
+  validated_at DateTime?
+
+  user    User   @relation(fields: [user_id], references: [id])
+  user_id String
+
+  gym    Gym    @relation(fields: [gym_id], references: [id])
+  gym_id String
+
+  @@map("check_ins")
+}
+
+// DADOS DA ACADEMIA
+model Gym {
+  id          String  @id @default(uuid())
+  title       String
+  description String?
+  phone       String?
+  latitude    Decimal
+  longitude   Decimal
+
+  checkIns CheckIn[] // uma academia pode ter vários checkins
+
+  @@map("gyms")
+}

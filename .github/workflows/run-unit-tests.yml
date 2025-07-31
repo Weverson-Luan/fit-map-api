@@ -15,6 +15,6 @@ jobs:
           node-version: 18 ## versão do node
           cache: 'npm' ## para armezanar o cahche das dependêcias
 
-      - run: npm ci ## comando para instalar as dependêcias
+      - run: npm install -f ## comando para instalar as dependêcias
 
       - run: npm run test ## comando para roda os testes únitarios da aplicação

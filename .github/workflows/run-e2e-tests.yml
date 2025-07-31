@@ -1,33 +1,63 @@
 name: Run E2E Tests
 
-on: [pull_request] ## quando houver uma pull request
+on:
+  pull_request: # dispara quando abrir PR
+  push:
+    branches: [main, develop]
 
 jobs:
-  run-e2e-tests: ## jobs
-    name: Run E2E Tests ## nome job
-    runs-on: ubuntu-20.04 # Máquina para rodar os jobs
+  run-e2e-tests:
+    name: Run E2E Tests
+    runs-on: ubuntu-20.04
 
-    services: ## serviços
+    services:
       postgres:
-        image: bitnami/postgresql ## imagem do banco de dados
+        image: postgres:15
         ports:
-          - 5432:5432 ## porta que vai rodar
+          - 5432:5432
         env:
-          POSTGRESQL_USERNAME: docker ## username do banco
-          POSTGRESQL_PASSWORD: docker ## senha do banco
-          POSTGRESQL_DATABASE: fitmap ## nome do banco
+          POSTGRES_USER: docker
+          POSTGRES_PASSWORD: docker
+          POSTGRES_DB: fitmap
+        options: >-
+          --health-cmd="pg_isready -U docker"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
     steps:
-      - uses: actions/checkout@v3 ## baixar o código da aplicação
+      # 1️⃣ Baixar o código
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3 ## utilizar o node
+      # 2️⃣ Configurar Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 18 ## versão do node
-          cache: 'npm' ## para armezanar o cahche das dependêcias
+          node-version: 20
+          cache: 'npm'
 
-      - run: npm install -f ## comando para instalar as dependêcias
+      # 3️⃣ Instalar dependências
+      - name: Install dependencies
+        run: npm ci
 
-      - run: npm run test:e2e ## comando para roda os testes únitarios da aplicação
+      # 4️⃣ Esperar o banco estar pronto
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h localhost -p 5432 -U docker; do
+            echo "⏳ Aguardando PostgreSQL...";
+            sleep 2;
+          done
+
+      # 5️⃣ Rodar migrações do Prisma
+      - name: Run Prisma Migrations
+        run: npx prisma migrate deploy
         env:
+          DATABASE_URL: postgresql://docker:docker@localhost:5432/fitmap?schema=public
+
+      # 6️⃣ Rodar testes E2E
+      - name: Run E2E Tests
+        run: npm run test:e2e
+        env:
+          DATABASE_URL: postgresql://docker:docker@localhost:5432/fitmap?schema=public
           JWT_SECRET: fitmap
-          DATABASE_URL: 'postgresql://docker:docker@localhost:5432/fitmap?schema=public'

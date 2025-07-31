@@ -5,7 +5,7 @@ on: [pull_request] ## quando houver uma pull request
 jobs:
   run-e2e-tests: ## jobs
     name: Run E2E Tests ## nome job
-    runs-on: ubuntu-20.04 ## maquina para rodar os jobs
+    runs-on: ubuntu-20.04 # Máquina para rodar os jobs
 
     services: ## serviços
       postgres:

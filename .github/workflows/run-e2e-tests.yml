@@ -30,4 +30,4 @@ jobs:
       - run: npm run test:e2e ## comando para roda os testes únitarios da aplicação
         env:
           JWT_SECRET: testing
-          DATABASE_URL: 'postgresql://docker:docker@localhost:5432/apisolid?schema=public'
+          DATABASE_URL: 'postgresql://docker:docker@localhost:5432/fitmap?schema=public'

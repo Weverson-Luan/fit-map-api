@@ -41,7 +41,7 @@ jobs:
 
       # 3️⃣ Instalar dependências
       - name: Install dependencies
-        run: npm ci
+        run: npm install -f
 
       # 4️⃣ Esperar o banco estar pronto
       - name: Wait for PostgreSQL

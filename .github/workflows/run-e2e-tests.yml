@@ -27,6 +27,8 @@ jobs:
 
       - run: npm install -f ## comando para instalar as dependêcias
 
+      - run: npx prisma generate ## 🔹 Gera o Prisma Client com os binários corretos
+
       - run: npm run test:e2e ## comando para roda os testes únitarios da aplicação
         env:
           JWT_SECRET: testing

@@ -27,12 +27,6 @@ jobs:
 
       - run: npm install -f ## comando para instalar as dependêcias
 
-      # Gera o Prisma Client com binário correto
-      - run: npx prisma generate
-
-      # Aplica migrations no Postgres
-      - run: npx prisma migrate deploy
-
       - run: npm run test:e2e ## comando para roda os testes únitarios da aplicação
         env:
           JWT_SECRET: fitmap

@@ -11,8 +11,9 @@
 // N para N -> Um dado de uma tabela vai se relacionar com varios dados de outra tabela e um registro da tabela pode está relacionado com outra
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  provider      = "prisma-client-js"
+  output        = "../generated/prisma"
+  binaryTargets = ["debian-openssl-3.0.x"]
 }
 
 datasource db {

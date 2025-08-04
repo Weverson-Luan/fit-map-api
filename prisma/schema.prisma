@@ -11,9 +11,10 @@
 // N para N -> Um dado de uma tabela vai se relacionar com varios dados de outra tabela e um registro da tabela pode está relacionado com outra
 
 generator client {
-  provider   = "prisma-client-js"
-  output     = "../generated/prisma"
-  engineType = "binary" // 👈 força a usar a engine nativa e evita erro no GitHub Actions
+  provider      = "prisma-client-js"
+  output        = "../generated/prisma"
+  engineType    = "binary" // 👈 força a usar a engine nativa e evita erro no GitHub Actions
+  binaryTargets = ["native", "debian-openssl-3.0.x"] // 👈 isso é ESSENCIAL!
 }
 
 datasource db {
